@@ -137,3 +137,17 @@ Invariants: PASS (all 10 invariants report 0 violations)
 Conformance: PASS (spec-conformance: MATCH 20 / NOT BUILT YET 0 / DEVIATION 0)
 Deviations from the plan: none
 Open items / blockers: none
+
+## Step 08 - Expiry job and CONC-03        date: 2026-11-13
+Commits: 
+- cc79eb8 feat(expiry): implement 60s background hold expiry job and CONC-03
+Tag: step-08
+Commands run and results:
+- `mvn test -f backend/pom.xml` -> exit code 0, 87 tests, 0 failures (EXP-01..04, CONC-03 pass)
+- `scripts/verify-invariants.sh` (hotel_booking_test) -> exit code 0, row counts (5, 25, 9125, 0), violations=0
+- `scripts/verify-invariants.sh` (hotel_booking) -> exit code 0, row counts (5, 25, 0, 0), violations=0
+- `scripts/check-frozen.sh` -> exit code 0, 6 files OK
+Invariants: PASS (all 10 invariants report 0 violations)
+Conformance: PASS (spec-conformance: MATCH 20 / NOT BUILT YET 0 / DEVIATION 0)
+Deviations from the plan: none
+Open items / blockers: none
