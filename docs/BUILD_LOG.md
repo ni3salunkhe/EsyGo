@@ -51,7 +51,7 @@ Open items / blockers: none
 ## Step 02 - Database        date: 2026-11-13
 Commits: 
 - b71ee21 db(seed): implement seed data, inventory initializer and test bootstrap
-- (pending) docs: log step 02
+- f74ba4a docs: log step 02
 Tag: step-02
 Commands run and results:
 - `cd backend; mvn clean test` -> exit code 0, 12 tests, 0 failures (DB-01..04 pass)
