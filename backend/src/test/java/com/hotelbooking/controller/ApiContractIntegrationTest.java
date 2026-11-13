@@ -302,7 +302,7 @@ class ApiContractIntegrationTest {
         assertThat(browseArray.size()).isGreaterThan(0);
 
         Set<String> browseExpectedFields = Set.of(
-                "id", "name", "location", "address", "description", "imageUrl", "amenities", "pricePerNight"
+                "id", "name", "location", "address", "description", "imageUrl", "images", "amenities", "pricePerNight"
         );
         for (JsonNode hotelNode : browseArray) {
             Iterator<String> fields = hotelNode.fieldNames();
@@ -321,7 +321,7 @@ class ApiContractIntegrationTest {
         JsonNode searchArray = objectMapper.readTree(searchResult.getResponse().getContentAsString());
         assertThat(searchArray.isArray()).isTrue();
         Set<String> searchExpectedFields = Set.of(
-                "id", "name", "location", "address", "description", "imageUrl", "amenities", "pricePerNight",
+                "id", "name", "location", "address", "description", "imageUrl", "images", "amenities", "pricePerNight",
                 "availableRooms", "nights", "totalAmount"
         );
         for (JsonNode hotelNode : searchArray) {

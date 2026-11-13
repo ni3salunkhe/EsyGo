@@ -16,6 +16,7 @@ public record HotelResponse(
         String address,
         String description,
         String imageUrl,
+        List<String> images,
         List<String> amenities,
         BigDecimal pricePerNight,
         @JsonInclude(JsonInclude.Include.NON_NULL)

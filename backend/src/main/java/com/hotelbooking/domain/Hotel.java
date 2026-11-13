@@ -1,5 +1,6 @@
 package com.hotelbooking.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,12 +10,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -55,6 +59,10 @@ public class Hotel {
     )
     @OrderBy("id ASC")
     private Set<Amenity> amenities = new HashSet<>();
+
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OrderBy("displayOrder ASC, id ASC")
+    private List<HotelImage> images = new ArrayList<>();
 
     public Hotel() {
     }
@@ -139,6 +147,14 @@ public class Hotel {
 
     public void setAmenities(Set<Amenity> amenities) {
         this.amenities = amenities;
+    }
+
+    public List<HotelImage> getImages() {
+        return images;
+    }
+
+    public void setImages(List<HotelImage> images) {
+        this.images = images;
     }
 
     @Override

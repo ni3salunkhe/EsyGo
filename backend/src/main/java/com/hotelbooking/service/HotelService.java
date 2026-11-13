@@ -2,6 +2,7 @@ package com.hotelbooking.service;
 
 import com.hotelbooking.domain.Amenity;
 import com.hotelbooking.domain.Hotel;
+import com.hotelbooking.domain.HotelImage;
 import com.hotelbooking.dto.HotelResponse;
 import com.hotelbooking.exception.ResourceNotFoundException;
 import com.hotelbooking.repository.HotelRepository;
@@ -116,6 +117,10 @@ public class HotelService {
                 .sorted()
                 .toList();
 
+        List<String> images = hotel.getImages().stream()
+                .map(HotelImage::getImageUrl)
+                .toList();
+
         BigDecimal price = hotel.getPricePerNight().setScale(2, RoundingMode.HALF_UP);
         BigDecimal total = totalAmount != null ? totalAmount.setScale(2, RoundingMode.HALF_UP) : null;
 
@@ -126,6 +131,7 @@ public class HotelService {
                 hotel.getAddress(),
                 hotel.getDescription(),
                 hotel.getImageUrl(),
+                images,
                 amenities,
                 price,
                 availableRooms,

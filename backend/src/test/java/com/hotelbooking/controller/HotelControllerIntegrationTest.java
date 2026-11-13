@@ -277,4 +277,15 @@ class HotelControllerIntegrationTest {
                 .andExpect(jsonPath("$.code", equalTo("VALIDATION_ERROR")))
                 .andExpect(jsonPath("$.fieldErrors", hasSize(greaterThanOrEqualTo(1))));
     }
+
+    @Test
+    @DisplayName("API Contract: Multiple gallery images returned for hotel")
+    void testMultipleGalleryImagesReturned() throws Exception {
+        mockMvc.perform(get("/api/hotels/1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(1)))
+                .andExpect(jsonPath("$.images", hasSize(3)))
+                .andExpect(jsonPath("$.images[0]", notNullValue()));
+    }
 }

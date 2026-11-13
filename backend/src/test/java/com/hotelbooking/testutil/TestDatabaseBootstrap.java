@@ -44,6 +44,7 @@ public class TestDatabaseBootstrap {
         jdbcTemplate.execute("DROP TABLE IF EXISTS room_night");
         jdbcTemplate.execute("DROP TABLE IF EXISTS booking");
         jdbcTemplate.execute("DROP TABLE IF EXISTS hotel_amenity");
+        jdbcTemplate.execute("DROP TABLE IF EXISTS hotel_image");
         jdbcTemplate.execute("DROP TABLE IF EXISTS room");
         jdbcTemplate.execute("DROP TABLE IF EXISTS amenity");
         jdbcTemplate.execute("DROP TABLE IF EXISTS hotel");

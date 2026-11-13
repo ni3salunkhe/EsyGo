@@ -31,6 +31,18 @@ CREATE TABLE hotel_amenity (
   FOREIGN KEY (amenity_id) REFERENCES amenity(id)
 );
 
+CREATE TABLE hotel_image (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  hotel_id BIGINT NOT NULL,
+  image_url VARCHAR(500) NOT NULL,
+  caption VARCHAR(100),
+  display_order INT DEFAULT 0,
+  is_primary BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (hotel_id) REFERENCES hotel(id) ON DELETE CASCADE,
+  INDEX idx_hotel_image_hotel_id (hotel_id)
+);
+
 CREATE TABLE room (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   hotel_id BIGINT NOT NULL,

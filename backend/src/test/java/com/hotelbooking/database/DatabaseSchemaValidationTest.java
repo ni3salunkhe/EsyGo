@@ -29,7 +29,7 @@ class DatabaseSchemaValidationTest {
     }
 
     @Test
-    @DisplayName("DB-01: db/schema.sql applies cleanly to empty test database and creates all 6 tables")
+    @DisplayName("DB-01: db/schema.sql applies cleanly to empty test database and creates all 7 tables")
     void schemaAppliesCleanlyToEmptyDb() {
         List<String> tables = jdbcTemplate.queryForList(
                 "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()",
@@ -41,6 +41,7 @@ class DatabaseSchemaValidationTest {
                         "hotel",
                         "amenity",
                         "hotel_amenity",
+                        "hotel_image",
                         "room",
                         "booking",
                         "room_night"

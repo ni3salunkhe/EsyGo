@@ -101,3 +101,25 @@ INSERT INTO room (id, hotel_id, room_number) VALUES
   (23, 5, '102'),
   (24, 5, '201'),
   (25, 5, '202');
+
+-- 5. Hotel Gallery Images (multiple images per hotel)
+INSERT INTO hotel_image (hotel_id, image_url, caption, display_order, is_primary) VALUES
+  (1, 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80', 'Beachfront view', 1, TRUE),
+  (1, 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80', 'Resort swimming pool', 2, FALSE),
+  (1, 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=80', 'Luxury suite bedroom', 3, FALSE),
+
+  (2, 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1200&q=80', 'Palms hideaway exterior', 1, TRUE),
+  (2, 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80', 'Garden walkway', 2, FALSE),
+  (2, 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1200&q=80', 'Boutique bedroom interior', 3, FALSE),
+
+  (3, 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80', 'Grand facade at night', 1, TRUE),
+  (3, 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80', 'Executive suite lounge', 2, FALSE),
+  (3, 'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=1200&q=80', 'Skyline rooftop terrace', 3, FALSE),
+
+  (4, 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&w=1200&q=80', 'Heritage palace courtyard', 1, TRUE),
+  (4, 'https://images.unsplash.com/photo-1561501900-3701fa6a0864?auto=format&fit=crop&w=1200&q=80', 'Royal Rajasthani suite', 2, FALSE),
+  (4, 'https://images.unsplash.com/photo-1549294413-26f195200c16?auto=format&fit=crop&w=1200&q=80', 'Traditional fountain patio', 3, FALSE),
+
+  (5, 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80', 'Contemporary modern facade', 1, TRUE),
+  (5, 'https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80', 'Design interior lobby', 2, FALSE),
+  (5, 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=1200&q=80', 'Ergonomic urban room', 3, FALSE);
