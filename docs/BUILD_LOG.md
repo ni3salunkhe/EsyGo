@@ -109,3 +109,17 @@ Invariants: PASS (all 10 invariants report 0 violations)
 Conformance: PASS (spec-conformance: MATCH 17 / NOT BUILT YET 3 / DEVIATION 0)
 Deviations from the plan: none
 Open items / blockers: none
+
+## Step 06 - Reserve (the hold)        date: 2026-11-13
+Commits: 
+- ab82416 feat(booking): implement reserve flow with hold, fallback, and deadlock retry
+Tag: step-06
+Commands run and results:
+- `mvn test -f backend/pom.xml` -> exit code 0, 66 tests, 0 failures (RES-01..05, CONC-01, CONC-02 pass)
+- `scripts/verify-invariants.sh` (hotel_booking_test) -> exit code 0, row counts (5, 25, 9125, 0), violations=0
+- `scripts/verify-invariants.sh` (hotel_booking) -> exit code 0, row counts (5, 25, 0, 0), violations=0
+- `& "C:\Program Files\Git\bin\bash.exe" scripts/check-frozen.sh` -> exit code 0, 6 files OK
+Invariants: PASS (all 10 invariants report 0 violations)
+Conformance: PASS (spec-conformance: MATCH 19 / NOT BUILT YET 1 / DEVIATION 0)
+Deviations from the plan: none
+Open items / blockers: none
