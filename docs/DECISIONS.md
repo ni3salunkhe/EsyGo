@@ -21,3 +21,11 @@ who decided (owner name or "owner approved in chat"), and the evidence/reason. N
 | D-13 | Libraries: Spring Web, Validation, Data JPA, MySQL driver, Spring Boot Test only. No Lombok, no OpenAPI, no migration tools unless approved | DEFAULT | pack author |
 | D-14 | Seed image URLs are NULL (no invented URLs) | DEFAULT | pack author |
 | D-15 | No deployments, no CI/CD, no pushing, no remote git operations | AGREED | owner request |
+| D-16 | OS: Windows 11; scripts executed with Git Bash (`C:\Program Files\Git\bin\bash.exe`), builds via PowerShell | AGREED | owner approved in chat (2026-11-13, Q-01) |
+| D-17 | Database: local MySQL 8.0.46 on port 3306; dev DB `hotel_booking`, test DB `hotel_booking_test`; credentials via env vars | AGREED | owner approved in chat (2026-11-13, Q-02) |
+| D-18 | Build tool: Apache Maven 3.9.9 (`mvn` / Maven Wrapper) | AGREED | owner approved in chat (2026-11-13, Q-03) |
+| D-19 | Target runtime: Java 17 LTS (Temurin 17.0.13) with Spring Boot 3.4.4 | AGREED | owner approved in chat (2026-11-13, Q-04) |
+| D-20 | Git commit identity: `ni3 <salunkhe6661@gmail.com>` | AGREED | owner approved in chat (2026-11-13, Q-05) |
+| D-21 | Application time zone for "today": `Asia/Kolkata` (configurable via `app.booking.zone-id`) | AGREED | owner approved in chat (2026-11-13, Q-06) |
+| D-22 | Base Java package: `com.hotelbooking` | AGREED | owner approved in chat (2026-11-13, Q-07) |
+| D-23 | Backend code placed in `backend/` directory | AGREED | owner approved in chat (2026-11-13, Q-08) |
