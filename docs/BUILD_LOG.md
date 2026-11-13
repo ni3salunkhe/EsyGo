@@ -123,3 +123,17 @@ Invariants: PASS (all 10 invariants report 0 violations)
 Conformance: PASS (spec-conformance: MATCH 19 / NOT BUILT YET 1 / DEVIATION 0)
 Deviations from the plan: none
 Open items / blockers: none
+
+## Step 07 - Confirm, retrieve, cancel        date: 2026-11-13
+Commits: 
+- fb18dda feat(booking): implement confirm, retrieve, and cancel workflows with state guards
+Tag: step-07
+Commands run and results:
+- `mvn test -f backend/pom.xml` -> exit code 0, 82 tests, 0 failures (CNF-01..05, GET-01..03, CAN-01..06, CONC-04, CONC-05 pass)
+- `scripts/verify-invariants.sh` (hotel_booking_test) -> exit code 0, row counts (5, 25, 9125, 0), violations=0
+- `scripts/verify-invariants.sh` (hotel_booking) -> exit code 0, row counts (5, 25, 0, 0), violations=0
+- `& "C:\Program Files\Git\bin\bash.exe" scripts/check-frozen.sh` -> exit code 0, 6 files OK
+Invariants: PASS (all 10 invariants report 0 violations)
+Conformance: PASS (spec-conformance: MATCH 20 / NOT BUILT YET 0 / DEVIATION 0)
+Deviations from the plan: none
+Open items / blockers: none
