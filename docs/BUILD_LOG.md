@@ -160,3 +160,17 @@ Findings:
 - F-01 (HIGH): G3/M5 mutation survived initially; RESOLVED by strengthening ReserveIntegrationTest#testReserveCandidateFallback (RES-03) with candidate 1 zero-records and total nights assertions. Mutation M5 re-verified and killed (expected: 0 but was: 2). Full 87-test suite passes.
 10-Run Concurrency & Stability (C1/G4): 10/10 runs passed (87/87 tests clean).
 Report: audits/AUDIT-20261113-1.md
+
+## Step 09 - Error handling and contract        date: 2026-11-13
+Commits: 
+- 98e7df5 feat(api): implement comprehensive API contract verification and error handling (API-01..06)
+Tag: step-09
+Commands run and results:
+- `mvn test -Dtest=ApiContractIntegrationTest -f backend/pom.xml` -> exit code 0, 11 tests, 0 failures (API-01..06 pass)
+- `mvn test -f backend/pom.xml` -> exit code 0, 98 tests, 0 failures
+- `Get-Content db/audit/invariants.sql | mysql hotel_booking_test` -> exit code 0, all 10 invariants report 0 violations
+- `docs/FROZEN.sha256` hash validation -> exit code 0, 6 files OK
+Invariants: PASS (all 10 invariants report 0 violations)
+Conformance: PASS (spec-conformance: MATCH 20 / NOT BUILT YET 0 / DEVIATION 0)
+Deviations from the plan: none
+Open items / blockers: none
