@@ -16,6 +16,7 @@ Open items / blockers: none | <ids from docs/OPEN_QUESTIONS.md>
 Commits: 
 - 9b87d39 chore: add handover pack
 - 0054c31 docs: record environment and decisions
+- 14b1c4f docs: record commit hash in build log
 Tag: none
 Commands run and results:
 - `& "C:\Program Files\Git\bin\bash.exe" scripts/check-frozen.sh` -> exit code 0, 6 files OK
@@ -30,3 +31,18 @@ Invariants: NOT RUN (no application tables populated; step 0 gate only)
 Conformance: Handover pack and frozen hashes verified PASS
 Deviations from the plan: none
 Open items / blockers: none (Q-01 through Q-08 answered and closed in docs/DECISIONS.md)
+
+## Step 01 - Scaffold        date: 2026-11-13
+Commits: 
+- 03b793c build(scaffold): configure Spring Boot project and layered architecture
+- (pending) docs: log step 01
+Tag: step-01
+Commands run and results:
+- `cd backend; mvn clean test` -> exit code 0, 6 tests, 0 failures
+- `& "C:\Program Files\Git\bin\bash.exe" scripts/check-frozen.sh` -> exit code 0, 6 files OK
+- `& "C:\Program Files\Git\bin\bash.exe" scripts/check-pack.sh` -> exit code 0, PACK CHECK: PASS
+- `git check-ignore .env backend/target/` -> exit code 0, both ignored
+Invariants: NOT RUN (no tables populated; Step 1 scaffold only)
+Conformance: PASS (spec-conformance: MATCH 4 / NOT BUILT YET 16 / DEVIATION 0)
+Deviations from the plan: none
+Open items / blockers: none
