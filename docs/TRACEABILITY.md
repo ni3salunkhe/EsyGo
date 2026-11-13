@@ -14,7 +14,7 @@ Requirement texts are from docs/00-assignment-verbatim.md.
 | R-06 | Confirmation with unique reference | 02 s4, 01 s4 | | CNF-01, REF-01..03 | | NOT STARTED |
 | R-07 | Retrieve booking by reference + email | 02 s5 | | GET-01..03 | | NOT STARTED |
 | R-08 | Cancel a booking | 02 s6, 03 | | CAN-01..06 | | NOT STARTED |
-| R-09 | Sample data for >= 5 hotels, single room category | 01 s1 | | DB-02 | | NOT STARTED |
+| R-09 | Sample data for >= 5 hotels, single room category | 01 s1 | db/seed.sql | DB-02 | mvn clean test (DB-02), 2026-11-13, 5 hotels, 25 rooms, 8 amenities (PASS) | VERIFIED |
 | R-10 | Check-out after check-in | 02 s8 | | VAL-03, VAL-04 | | NOT STARTED |
 | R-11 | Check-in not in the past | 02 s8 | | VAL-01, VAL-02 | | NOT STARTED |
 | R-12 | Total computed on the backend (nights x price) | 02 s3 | | PRC-01, PRC-02 | | NOT STARTED |
@@ -24,9 +24,9 @@ Requirement texts are from docs/00-assignment-verbatim.md.
 | R-16 | Document assumptions incl. overlapping stays | 01 s6, s11 | README.md | (doc review in audit) | | NOT STARTED |
 | R-17 | Surprise feature + write-up (what/why/how) | 01 s9 | README.md + code | RES-01, EXP-*, CNF-04 | | NOT STARTED |
 | R-18 | REST APIs with Spring Boot (frontend connection = phase 2) | 02 | | API-* | | NOT STARTED |
-| R-19 | Persist hotel, availability, booking in MySQL | 01 s4 | | DB-01..03 | | NOT STARTED |
+| R-19 | Persist hotel, availability, booking in MySQL | 01 s4 | db/schema.sql, backend/src/main/java/com/hotelbooking/service/InventoryInitializer.java | DB-01..03 | mvn clean test (DB-01, DB-02, DB-03), 2026-11-13 (PASS) | VERIFIED |
 | R-20 | Clear code organization / separation of responsibilities | docs/06 F1 | com.hotelbooking.* (controller, service, repository, domain, dto, exception, config) | (audit F1) | Layered packages scaffolded (Step 1) | IN PROGRESS |
 | R-21 | Backend validation + consistent error responses | 02 s7-8 | | API-01..05 | | NOT STARTED |
-| R-22 | DB setup instructions + sample data | 04 step 2 | README.md, db/seed.sql | DB-02, audit H1 | | NOT STARTED |
+| R-22 | DB setup instructions + sample data | 04 step 2 | README.md, db/seed.sql | DB-02, audit H1 | Followed instructions literally on hotel_booking and scripts/verify-invariants.sh, 2026-11-13 (PASS) | VERIFIED |
 | R-23 | Meaningful automated tests: calculations + availability rules | 05 | | PRC-*, SRC-*, CONC-* | | NOT STARTED |
 | R-24 | Credentials/secrets out of the repository | 01 s8 | .gitignore, backend/src/main/resources/application.properties, .env.example | SEC-01, SEC-02 | git check-ignore .env backend/target/, git log -p grep, 2026-11-13 (PASS) | VERIFIED |
