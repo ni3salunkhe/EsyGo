@@ -15,7 +15,7 @@ Open items / blockers: none | <ids from docs/OPEN_QUESTIONS.md>
 ## Step 00 - Step 0 gate (/start)        date: 2026-11-13
 Commits: 
 - 9b87d39 chore: add handover pack
-- (pending) docs: record environment and decisions
+- 0054c31 docs: record environment and decisions
 Tag: none
 Commands run and results:
 - `& "C:\Program Files\Git\bin\bash.exe" scripts/check-frozen.sh` -> exit code 0, 6 files OK
