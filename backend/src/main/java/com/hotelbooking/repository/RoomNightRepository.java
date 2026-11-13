@@ -156,4 +156,72 @@ public class RoomNightRepository {
         );
         return count != null ? count : 0;
     }
+
+    public record HotelAvailability(Long hotelId, int availableRooms) {}
+
+    /**
+     * Executes the search availability query from docs/03-flows.md.
+     * Returns hotels that have at least one room available for all nights in [checkIn, checkOut).
+     * Ordered by hotel name ASC.
+     */
+    public List<HotelAvailability> findAvailableHotels(LocalDate checkIn, LocalDate checkOut, int nights, String location) {
+        StringBuilder sql = new StringBuilder("""
+                SELECT h.id, COUNT(*) AS available_rooms
+                FROM hotel h
+                JOIN (SELECT r.hotel_id, r.id AS room_id
+                      FROM room r JOIN room_night rn ON rn.room_id = r.id
+                      WHERE rn.stay_date >= ? AND rn.stay_date < ? AND rn.status = 'AVAILABLE'
+                      GROUP BY r.id, r.hotel_id
+                      HAVING COUNT(*) = ?) ar ON ar.hotel_id = h.id
+                """);
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        params.add(Date.valueOf(checkIn));
+        params.add(Date.valueOf(checkOut));
+        params.add(nights);
+
+        if (location != null && !location.isBlank()) {
+            sql.append(" WHERE LOWER(h.location) = LOWER(?) ");
+            params.add(location.trim());
+        }
+        sql.append(" GROUP BY h.id ORDER BY h.name ASC");
+
+        return jdbcTemplate.query(
+                sql.toString(),
+                (rs, rowNum) -> new HotelAvailability(
+                        rs.getLong("id"),
+                        rs.getInt("available_rooms")
+                ),
+                params.toArray()
+        );
+    }
+
+    /**
+     * Counts available rooms for a specific hotel for all nights in [checkIn, checkOut).
+     * Returns 0 if none available.
+     */
+    public int countAvailableRoomsForHotel(Long hotelId, LocalDate checkIn, LocalDate checkOut, int nights) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM (
+                    SELECT r.id
+                    FROM room r
+                    JOIN room_night rn ON rn.room_id = r.id
+                    WHERE r.hotel_id = ?
+                      AND rn.stay_date >= ?
+                      AND rn.stay_date < ?
+                      AND rn.status = 'AVAILABLE'
+                    GROUP BY r.id
+                    HAVING COUNT(*) = ?
+                ) ar
+                """;
+        Integer count = jdbcTemplate.queryForObject(
+                sql,
+                Integer.class,
+                hotelId,
+                Date.valueOf(checkIn),
+                Date.valueOf(checkOut),
+                nights
+        );
+        return count != null ? count : 0;
+    }
 }
