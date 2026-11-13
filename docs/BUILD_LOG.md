@@ -84,7 +84,7 @@ Open items / blockers: none
 ## Step 04 - Pricing, validation, reference generator        date: 2026-11-13
 Commits: 
 - d6390f4 feat(service): implement pricing, validation, reference generator, and deadlock retry
-- (pending) docs: log step 04
+- f0e0ed8 docs: log step 04
 Tag: step-04
 Commands run and results:
 - `cd backend; mvn clean test` -> exit code 0, 49 tests, 0 failures (PRC-*, VAL-*, REF-*, RETRY-* pass)
