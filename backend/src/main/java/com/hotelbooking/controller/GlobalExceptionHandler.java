@@ -143,6 +143,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
+    @ExceptionHandler(com.hotelbooking.exception.SoldOutException.class)
+    public ResponseEntity<ErrorResponse> handleSoldOutException(com.hotelbooking.exception.SoldOutException ex) {
+        ErrorResponse error = new ErrorResponse(
+                Instant.now(clock),
+                HttpStatus.CONFLICT.value(),
+                "SOLD_OUT",
+                ex.getMessage(),
+                List.of()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         log.error("Unhandled exception caught by GlobalExceptionHandler", ex);

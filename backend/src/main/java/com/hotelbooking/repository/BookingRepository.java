@@ -11,5 +11,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Booking
 
     Optional<Booking> findByReference(String reference);
 
+    boolean existsByReference(String reference);
+
     Optional<Booking> findByReferenceAndGuestEmailIgnoreCase(String reference, String guestEmail);
 }
