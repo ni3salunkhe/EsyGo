@@ -25,8 +25,8 @@ Requirement texts are from docs/00-assignment-verbatim.md.
 | R-17 | Surprise feature + write-up (what/why/how) | 01 s9 | README.md + code | RES-01, EXP-*, CNF-04 | | NOT STARTED |
 | R-18 | REST APIs with Spring Boot (frontend connection = phase 2) | 02 | | API-* | | NOT STARTED |
 | R-19 | Persist hotel, availability, booking in MySQL | 01 s4 | | DB-01..03 | | NOT STARTED |
-| R-20 | Clear code organization / separation of responsibilities | docs/06 F1 | | (audit F1) | | NOT STARTED |
+| R-20 | Clear code organization / separation of responsibilities | docs/06 F1 | com.hotelbooking.* (controller, service, repository, domain, dto, exception, config) | (audit F1) | Layered packages scaffolded (Step 1) | IN PROGRESS |
 | R-21 | Backend validation + consistent error responses | 02 s7-8 | | API-01..05 | | NOT STARTED |
 | R-22 | DB setup instructions + sample data | 04 step 2 | README.md, db/seed.sql | DB-02, audit H1 | | NOT STARTED |
 | R-23 | Meaningful automated tests: calculations + availability rules | 05 | | PRC-*, SRC-*, CONC-* | | NOT STARTED |
-| R-24 | Credentials/secrets out of the repository | 01 s8 | | SEC-01, SEC-02 | | NOT STARTED |
+| R-24 | Credentials/secrets out of the repository | 01 s8 | .gitignore, backend/src/main/resources/application.properties, .env.example | SEC-01, SEC-02 | git check-ignore .env backend/target/, git log -p grep, 2026-11-13 (PASS) | VERIFIED |
