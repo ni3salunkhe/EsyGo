@@ -7,6 +7,8 @@ import com.hotelbooking.domain.Room;
 import com.hotelbooking.dto.BookingResponse;
 import com.hotelbooking.dto.FieldErrorItem;
 import com.hotelbooking.dto.ReserveBookingRequest;
+import com.hotelbooking.exception.HoldExpiredException;
+import com.hotelbooking.exception.InvalidStateException;
 import com.hotelbooking.exception.ResourceNotFoundException;
 import com.hotelbooking.exception.SoldOutException;
 import com.hotelbooking.exception.ValidationException;
@@ -23,6 +25,7 @@ import java.math.RoundingMode;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -39,6 +42,7 @@ public class BookingTransactionalService {
     private final RoomRepository roomRepository;
     private final RoomNightRepository roomNightRepository;
     private final BookingRepository bookingRepository;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
     private final Clock clock;
     private final int holdMinutes;
     private final int maxCandidateRooms;
@@ -51,6 +55,7 @@ public class BookingTransactionalService {
             RoomRepository roomRepository,
             RoomNightRepository roomNightRepository,
             BookingRepository bookingRepository,
+            org.springframework.jdbc.core.JdbcTemplate jdbcTemplate,
             Clock clock,
             @Value("${app.booking.hold-minutes:10}") int holdMinutes,
             @Value("${app.booking.max-candidate-rooms:5}") int maxCandidateRooms
@@ -62,6 +67,7 @@ public class BookingTransactionalService {
         this.roomRepository = roomRepository;
         this.roomNightRepository = roomNightRepository;
         this.bookingRepository = bookingRepository;
+        this.jdbcTemplate = jdbcTemplate;
         this.clock = clock;
         this.holdMinutes = holdMinutes;
         this.maxCandidateRooms = maxCandidateRooms;
@@ -175,6 +181,110 @@ public class BookingTransactionalService {
                 savedBooking.getTotalAmount(),
                 savedBooking.getExpiresAt(),
                 savedBooking.getCreatedAt() != null ? savedBooking.getCreatedAt() : now
+        );
+    }
+
+    @Transactional
+    public BookingResponse confirmBooking(String reference, String email) {
+        if (email == null || email.isBlank()) {
+            throw new ValidationException("email", "Email must be provided");
+        }
+        String normalizedEmail = bookingValidator.normalizeEmail(email);
+
+        Booking booking = bookingRepository.findByReferenceAndGuestEmailIgnoreCase(reference, normalizedEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with reference: " + reference));
+
+        if (booking.getStatus() == BookingStatus.CONFIRMED) {
+            return toResponse(booking);
+        }
+
+        if (booking.getStatus() == BookingStatus.CANCELLED || booking.getStatus() == BookingStatus.EXPIRED) {
+            throw new InvalidStateException("Cannot confirm booking in status " + booking.getStatus());
+        }
+
+        int affected = roomNightRepository.confirmRoomNights(booking.getId());
+        if (affected != booking.getNights()) {
+            // Check if a concurrent transaction already confirmed this booking
+            // Using a locking read (FOR SHARE) to break through REPEATABLE READ snapshot
+            String currentStatus = jdbcTemplate.queryForObject(
+                    "SELECT status FROM booking WHERE id = ? FOR SHARE",
+                    String.class,
+                    booking.getId()
+            );
+            if ("CONFIRMED".equalsIgnoreCase(currentStatus)) {
+                booking.setStatus(BookingStatus.CONFIRMED);
+                booking.setExpiresAt(null);
+                return toResponse(booking);
+            }
+            throw new HoldExpiredException("Hold period has expired for this booking.");
+        }
+
+        bookingRepository.confirmBooking(booking.getId());
+        booking.setStatus(BookingStatus.CONFIRMED);
+        booking.setExpiresAt(null);
+
+        return toResponse(booking);
+    }
+
+    @Transactional(readOnly = true)
+    public BookingResponse getBooking(String reference, String email) {
+        if (email == null || email.isBlank()) {
+            throw new ValidationException("email", "Email must be provided");
+        }
+        String normalizedEmail = bookingValidator.normalizeEmail(email);
+
+        Booking booking = bookingRepository.findByReferenceAndGuestEmailIgnoreCase(reference, normalizedEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with reference: " + reference));
+
+        return toResponse(booking);
+    }
+
+    @Transactional
+    public BookingResponse cancelBooking(String reference, String email) {
+        if (email == null || email.isBlank()) {
+            throw new ValidationException("email", "Email must be provided");
+        }
+        String normalizedEmail = bookingValidator.normalizeEmail(email);
+
+        Booking booking = bookingRepository.findByReferenceAndGuestEmailIgnoreCase(reference, normalizedEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with reference: " + reference));
+
+        if (booking.getStatus() == BookingStatus.CANCELLED) {
+            return toResponse(booking);
+        }
+
+        if (booking.getStatus() == BookingStatus.EXPIRED) {
+            throw new InvalidStateException("Cannot cancel an expired booking");
+        }
+
+        LocalDate today = LocalDate.now(clock);
+        if (!booking.getCheckIn().isAfter(today)) {
+            throw new InvalidStateException("Cannot cancel once the stay has started.");
+        }
+
+        roomNightRepository.releaseRoomNights(booking.getId());
+        bookingRepository.cancelBooking(booking.getId());
+        booking.setStatus(BookingStatus.CANCELLED);
+
+        return toResponse(booking);
+    }
+
+    private BookingResponse toResponse(Booking booking) {
+        return new BookingResponse(
+                booking.getReference(),
+                booking.getStatus().name(),
+                booking.getHotel().getId(),
+                booking.getHotel().getName(),
+                booking.getRoom().getRoomNumber(),
+                booking.getGuestName(),
+                booking.getGuestEmail(),
+                booking.getCheckIn(),
+                booking.getCheckOut(),
+                booking.getNights(),
+                booking.getPricePerNight(),
+                booking.getTotalAmount(),
+                booking.getExpiresAt(),
+                booking.getCreatedAt()
         );
     }
 }

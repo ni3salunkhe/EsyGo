@@ -25,4 +25,16 @@ public class BookingService {
     public BookingResponse reserve(ReserveBookingRequest request) {
         return deadlockRetryWrapper.runWithRetry(() -> bookingTransactionalService.reserve(request));
     }
+
+    public BookingResponse confirm(String reference, String email) {
+        return deadlockRetryWrapper.runWithRetry(() -> bookingTransactionalService.confirmBooking(reference, email));
+    }
+
+    public BookingResponse get(String reference, String email) {
+        return bookingTransactionalService.getBooking(reference, email);
+    }
+
+    public BookingResponse cancel(String reference, String email) {
+        return deadlockRetryWrapper.runWithRetry(() -> bookingTransactionalService.cancelBooking(reference, email));
+    }
 }

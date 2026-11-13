@@ -155,6 +155,30 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
+    @ExceptionHandler(com.hotelbooking.exception.HoldExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleHoldExpiredException(com.hotelbooking.exception.HoldExpiredException ex) {
+        ErrorResponse error = new ErrorResponse(
+                Instant.now(clock),
+                HttpStatus.CONFLICT.value(),
+                "HOLD_EXPIRED",
+                ex.getMessage(),
+                List.of()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(com.hotelbooking.exception.InvalidStateException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidStateException(com.hotelbooking.exception.InvalidStateException ex) {
+        ErrorResponse error = new ErrorResponse(
+                Instant.now(clock),
+                HttpStatus.CONFLICT.value(),
+                "INVALID_STATE",
+                ex.getMessage(),
+                List.of()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         log.error("Unhandled exception caught by GlobalExceptionHandler", ex);
