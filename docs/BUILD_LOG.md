@@ -36,6 +36,7 @@ Open items / blockers: none (Q-01 through Q-08 answered and closed in docs/DECIS
 Commits: 
 - 03b793c build(scaffold): configure Spring Boot project and layered architecture
 - 7953aec docs: log step 01
+- 9ad3764 docs: record commit hash for step 01 in build log
 Tag: step-01
 Commands run and results:
 - `cd backend; mvn clean test` -> exit code 0, 6 tests, 0 failures
@@ -44,5 +45,21 @@ Commands run and results:
 - `git check-ignore .env backend/target/` -> exit code 0, both ignored
 Invariants: NOT RUN (no tables populated; Step 1 scaffold only)
 Conformance: PASS (spec-conformance: MATCH 4 / NOT BUILT YET 16 / DEVIATION 0)
+Deviations from the plan: none
+Open items / blockers: none
+
+## Step 02 - Database        date: 2026-11-13
+Commits: 
+- b71ee21 db(seed): implement seed data, inventory initializer and test bootstrap
+- (pending) docs: log step 02
+Tag: step-02
+Commands run and results:
+- `cd backend; mvn clean test` -> exit code 0, 12 tests, 0 failures (DB-01..04 pass)
+- `scripts/verify-invariants.sh` (hotel_booking_test) -> exit code 0, row counts (5, 25, 9125, 0), violations=0
+- `scripts/verify-invariants.sh` (hotel_booking) -> exit code 0, row counts (5, 25, 0, 0), violations=0
+- `& "C:\Program Files\Git\bin\bash.exe" scripts/check-frozen.sh` -> exit code 0, 6 files OK
+- `& "C:\Program Files\Git\bin\bash.exe" scripts/check-pack.sh` -> exit code 0, PACK CHECK: PASS
+Invariants: PASS (all 10 invariants report 0 violations on seeded database)
+Conformance: PASS (spec-conformance: MATCH 7 / NOT BUILT YET 13 / DEVIATION 0)
 Deviations from the plan: none
 Open items / blockers: none
