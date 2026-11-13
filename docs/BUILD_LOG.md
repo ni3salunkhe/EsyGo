@@ -174,3 +174,19 @@ Invariants: PASS (all 10 invariants report 0 violations)
 Conformance: PASS (spec-conformance: MATCH 20 / NOT BUILT YET 0 / DEVIATION 0)
 Deviations from the plan: none
 Open items / blockers: none
+
+## Step 10 - Hardening, write-up, and final audit        date: 2026-11-13
+Commits: 
+- 07b6a0b docs: complete README assumptions, surprise feature write-up, and traceability
+Tag: step-10, backend-complete
+Commands run and results:
+- README.md updated with full setup, assumptions (docs/01 s11), and surprise feature write-up (what/why/how docs/01 s9)
+- `docs/TRACEABILITY.md` updated: all 24 requirements (R-01..24) verified PASS
+- 10 consecutive full test suite runs against `hotel_booking_test` -> 10/10 runs passed (98/98 tests each run, 980 total test executions, 0 failures, 0 flakes)
+- `Get-Content db/audit/invariants.sql | mysql hotel_booking_test` -> exit code 0, all 10 invariants report 0 violations
+- `docs/FROZEN.sha256` hash validation -> exit code 0, 6 files OK
+- Final audit: `audits/AUDIT-20261113-2.md` -> PASS 32 / FAIL 0 / NOT RUN 0 (Verdict: PASS)
+Invariants: PASS (all 10 invariants report 0 violations)
+Conformance: PASS (spec-conformance: MATCH 20 / NOT BUILT YET 0 / DEVIATION 0)
+Deviations from the plan: none
+Open items / blockers: none
