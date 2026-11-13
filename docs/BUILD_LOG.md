@@ -155,8 +155,8 @@ Open items / blockers: none
 ## Audit AUDIT-20261113-1 (post Step 08)        date: 2026-11-13
 Scope: commit d750567 (tag step-08)
 Auditor: agent
-Result: FAIL (PASS 31 / FAIL 1 / NOT RUN 0)
+Result: PASS (PASS 32 / FAIL 0 / NOT RUN 0)
 Findings:
-- F-01 (HIGH): G3/M5 mutation test survived in ReserveIntegrationTest#testReserveCandidateFallback (RES-03). Proposed fix: assert candidate 1 nights reverted to AVAILABLE.
+- F-01 (HIGH): G3/M5 mutation survived initially; RESOLVED by strengthening ReserveIntegrationTest#testReserveCandidateFallback (RES-03) with candidate 1 zero-records and total nights assertions. Mutation M5 re-verified and killed (expected: 0 but was: 2). Full 87-test suite passes.
 10-Run Concurrency & Stability (C1/G4): 10/10 runs passed (87/87 tests clean).
 Report: audits/AUDIT-20261113-1.md

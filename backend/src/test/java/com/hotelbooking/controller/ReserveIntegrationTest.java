@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hotelbooking.domain.BookingStatus;
 import com.hotelbooking.domain.RoomNightStatus;
 import com.hotelbooking.dto.ReserveBookingRequest;
+import com.hotelbooking.repository.RoomNightRepository;
 import com.hotelbooking.service.InventoryInitializer;
 import com.hotelbooking.testutil.TestDatabaseBootstrap;
 import org.junit.jupiter.api.AfterAll;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,6 +24,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -30,6 +33,9 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,6 +54,9 @@ class ReserveIntegrationTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @SpyBean
+    private RoomNightRepository roomNightRepository;
 
     private final LocalDate checkIn = LocalDate.now().plusDays(15);
     private final LocalDate checkOut = checkIn.plusDays(3); // 3 nights
@@ -185,6 +194,11 @@ class ReserveIntegrationTest {
         Long candidate1 = roomIds.get(0);
         Long candidate2 = roomIds.get(1);
 
+        // Simulate candidate search returning candidate1 first, then candidate2
+        doReturn(List.of(candidate1, candidate2))
+                .when(roomNightRepository)
+                .findCandidateRooms(eq(1L), eq(checkIn), eq(checkOut), eq(3), anyInt());
+
         // Mark middle night of candidate1 as already reserved
         jdbcTemplate.update(
                 "INSERT INTO booking (reference, hotel_id, room_id, guest_name, guest_email, check_in, check_out, nights, price_per_night, total_amount, status, expires_at) " +
@@ -228,6 +242,23 @@ class ReserveIntegrationTest {
                 candidate2
         );
         assertThat(claimedNights).isEqualTo(3);
+
+        // Verify candidate 1 has zero room_night records associated with this booking (partial claim was reverted)
+        Integer candidate1Nights = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM room_night WHERE booking_id = ? AND room_id = ?",
+                Integer.class,
+                actualBookingId,
+                candidate1
+        );
+        assertThat(candidate1Nights).isEqualTo(0);
+
+        // Verify total room_nights held by this booking equals exactly nights (3)
+        Integer totalBookingNights = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM room_night WHERE booking_id = ?",
+                Integer.class,
+                actualBookingId
+        );
+        assertThat(totalBookingNights).isEqualTo(3);
     }
 
     @Test
