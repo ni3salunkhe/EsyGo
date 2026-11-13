@@ -33,3 +33,7 @@ node_modules/
 AGENTS.md
 START_HERE.md
 
+# Internal documentation and scripts
+scripts/
+docs/
+
