@@ -1,0 +1,29 @@
+# secrets and local config
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# build output
+target/
+build/
+out/
+.gradle/
+*.class
+*.jar
+*.war
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# logs, dumps, scratch
+*.log
+logs/
+*.sql.gz
+*.dump
+node_modules/
