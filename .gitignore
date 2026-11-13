@@ -27,3 +27,9 @@ logs/
 *.sql.gz
 *.dump
 node_modules/
+
+# Local Antigravity agent configuration and instructions
+.agents/
+AGENTS.md
+START_HERE.md
+
