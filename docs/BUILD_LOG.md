@@ -68,7 +68,7 @@ Open items / blockers: none
 ## Step 03 - Domain and repositories        date: 2026-11-13
 Commits: 
 - 59d5714 feat(domain): map JPA entities and implement guarded repositories
-- (pending) docs: log step 03
+- 84e7548 docs: log step 03
 Tag: step-03
 Commands run and results:
 - `cd backend; mvn clean test` -> exit code 0, 27 tests, 0 failures (SCHEMA-VAL, T-REPO-01..12 pass)
