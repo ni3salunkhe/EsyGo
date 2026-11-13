@@ -56,7 +56,89 @@ Get-Content db\seed.sql | & "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.e
 
 *Note: Automated tests automatically apply `db/schema.sql` to `hotel_booking_test` during test execution.*
 
-### Step 2.3: Configure Environment Variables
+### Step 2.3: Loading Provided CSV Data into MySQL
+
+If importing hotel, room, and gallery inventory from provided CSV data files:
+
+1. Ensure the database schema has been applied first (`db/schema.sql`).
+2. Use one of the following methods to load the data into the `hotel_booking` database.
+
+#### Option A: Direct SQL Import Script (`db/import_csv_data.sql`)
+
+If using the pre-compiled SQL dump generated from the provided CSV dataset:
+
+```bash
+# On Linux / macOS or Git Bash (Windows):
+mysql -u hotel_user -p hotel_booking < db/import_csv_data.sql
+
+# On Windows PowerShell:
+Get-Content db\import_csv_data.sql | & "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u hotel_user -p hotel_booking
+```
+
+#### Option B: MySQL Command-Line (`LOAD DATA LOCAL INFILE`)
+
+To load directly from raw CSV files, connect to MySQL with `--local-infile=1`:
+
+```bash
+mysql --local-infile=1 -u hotel_user -p hotel_booking
+```
+
+Execute the import queries (adjust file paths to point to the provided CSV files):
+
+```sql
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- 1. Hotels
+LOAD DATA LOCAL INFILE 'path/to/provided/hotel.csv'
+INTO TABLE hotel
+FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(id, name, location, address, description, price_per_night, image_url);
+
+-- 2. Amenities
+LOAD DATA LOCAL INFILE 'path/to/provided/amenity.csv'
+INTO TABLE amenity
+FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(id, name);
+
+-- 3. Hotel-Amenity Links
+LOAD DATA LOCAL INFILE 'path/to/provided/hotel_amenity.csv'
+INTO TABLE hotel_amenity
+FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(hotel_id, amenity_id);
+
+-- 4. Rooms
+LOAD DATA LOCAL INFILE 'path/to/provided/room.csv'
+INTO TABLE room
+FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(id, hotel_id, room_number);
+
+-- 5. Hotel Gallery Images
+LOAD DATA LOCAL INFILE 'path/to/provided/hotel_image.csv'
+INTO TABLE hotel_image
+FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(id, hotel_id, image_url, caption, display_order, is_primary);
+
+SET FOREIGN_KEY_CHECKS = 1;
+```
+
+#### Option C: GUI Import (MySQL Workbench / DBeaver)
+1. Open MySQL Workbench/DBeaver and connect to the `hotel_booking` schema.
+2. For each table (`hotel`, `amenity`, `hotel_amenity`, `room`, `hotel_image`), right-click the table name and select **Table Data Import Wizard**.
+3. Browse to the corresponding provided CSV file, confirm field mappings, and complete the import.
+
+*Note: Once hotel and room data are loaded, starting the Spring Boot backend (`mvn spring-boot:run`) will automatically and idempotently initialize 365 days of `room_night` availability inventory for every room.*
+
+### Step 2.4: Configure Environment Variables
 
 Credentials must be supplied exclusively via environment variables (never committed to the repository):
 
@@ -266,3 +348,11 @@ Stack traces, SQL syntax, and internal Java class names are never exposed. Guest
 - **Frontend Test Suite:** 98/98 unit & integration tests passing across 10 suites (`npm test`).
 - **Production Build:** Vite bundle built cleanly in ~21s with zero warnings (`npm run build`).
 - **Audit Reports:** Detailed audit reports and screenshots located in `audits/`.
+
+---
+
+## 9. AI Tools Used
+
+- **Antigravity:** Testing and Code review
+- **Claude:** Verification improvement, High level design
+- **ChatGPT:** Exploratory architecture design and development assistance
