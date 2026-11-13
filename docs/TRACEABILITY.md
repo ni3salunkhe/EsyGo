@@ -25,7 +25,7 @@ Requirement texts are from docs/00-assignment-verbatim.md.
 | R-17 | Surprise feature + write-up (what/why/how) | 01 s9 | README.md + code | RES-01, EXP-*, CNF-04 | | NOT STARTED |
 | R-18 | REST APIs with Spring Boot (frontend connection = phase 2) | 02 | | API-* | | NOT STARTED |
 | R-19 | Persist hotel, availability, booking in MySQL | 01 s4 | db/schema.sql, backend/src/main/java/com/hotelbooking/service/InventoryInitializer.java | DB-01..03 | mvn clean test (DB-01, DB-02, DB-03), 2026-11-13 (PASS) | VERIFIED |
-| R-20 | Clear code organization / separation of responsibilities | docs/06 F1 | com.hotelbooking.* (controller, service, repository, domain, dto, exception, config) | (audit F1) | Layered packages scaffolded (Step 1) | IN PROGRESS |
+| R-20 | Clear code organization / separation of responsibilities | docs/06 F1 | com.hotelbooking.* (domain entities, repository classes, config) | (audit F1) | Domain entities & repositories implemented with strict layering (Step 3) | IN PROGRESS |
 | R-21 | Backend validation + consistent error responses | 02 s7-8 | | API-01..05 | | NOT STARTED |
 | R-22 | DB setup instructions + sample data | 04 step 2 | README.md, db/seed.sql | DB-02, audit H1 | Followed instructions literally on hotel_booking and scripts/verify-invariants.sh, 2026-11-13 (PASS) | VERIFIED |
 | R-23 | Meaningful automated tests: calculations + availability rules | 05 | | PRC-*, SRC-*, CONC-* | | NOT STARTED |

@@ -52,6 +52,7 @@ Open items / blockers: none
 Commits: 
 - b71ee21 db(seed): implement seed data, inventory initializer and test bootstrap
 - f74ba4a docs: log step 02
+- 4d2d6ae docs: record commit hash for step 02 in build log
 Tag: step-02
 Commands run and results:
 - `cd backend; mvn clean test` -> exit code 0, 12 tests, 0 failures (DB-01..04 pass)
@@ -61,5 +62,20 @@ Commands run and results:
 - `& "C:\Program Files\Git\bin\bash.exe" scripts/check-pack.sh` -> exit code 0, PACK CHECK: PASS
 Invariants: PASS (all 10 invariants report 0 violations on seeded database)
 Conformance: PASS (spec-conformance: MATCH 7 / NOT BUILT YET 13 / DEVIATION 0)
+Deviations from the plan: none
+Open items / blockers: none
+
+## Step 03 - Domain and repositories        date: 2026-11-13
+Commits: 
+- 59d5714 feat(domain): map JPA entities and implement guarded repositories
+- (pending) docs: log step 03
+Tag: step-03
+Commands run and results:
+- `cd backend; mvn clean test` -> exit code 0, 27 tests, 0 failures (SCHEMA-VAL, T-REPO-01..12 pass)
+- `scripts/verify-invariants.sh` (hotel_booking_test) -> exit code 0, row counts (5, 25, 9125, 0), violations=0
+- `& "C:\Program Files\Git\bin\bash.exe" scripts/check-frozen.sh` -> exit code 0, 6 files OK
+- `& "C:\Program Files\Git\bin\bash.exe" scripts/check-pack.sh` -> exit code 0, PACK CHECK: PASS
+Invariants: PASS (all 10 invariants report 0 violations on seeded database with inventory)
+Conformance: PASS (spec-conformance: MATCH 10 / NOT BUILT YET 10 / DEVIATION 0)
 Deviations from the plan: none
 Open items / blockers: none
