@@ -35,7 +35,7 @@ Open items / blockers: none (Q-01 through Q-08 answered and closed in docs/DECIS
 ## Step 01 - Scaffold        date: 2026-11-13
 Commits: 
 - 03b793c build(scaffold): configure Spring Boot project and layered architecture
-- (pending) docs: log step 01
+- 7953aec docs: log step 01
 Tag: step-01
 Commands run and results:
 - `cd backend; mvn clean test` -> exit code 0, 6 tests, 0 failures
