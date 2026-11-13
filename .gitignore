@@ -8,6 +8,7 @@
 # build output
 target/
 build/
+dist/
 out/
 .gradle/
 *.class

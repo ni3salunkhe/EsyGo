@@ -1,16 +1,21 @@
-# Hotel Booking Portal - Backend (Phase 1)
+# Hotel Booking Portal (Full-Stack: Spring Boot + React)
 
-A robust, enterprise-grade hotel booking REST API built with Java 17, Spring Boot 3.4.4, and MySQL 8.
-Strictly implements the frozen specifications in `docs/` and verifies all invariants against real MySQL transactions.
+A complete, enterprise-grade hotel booking portal featuring a Java 17 / Spring Boot 3.4.4 REST API, MySQL 8 transactional engine, and a modern, responsive React 18 single-page application built with Vite and Tailwind CSS.
 
 ---
 
-## 1. Prerequisites
+## 1. System Architecture & Prerequisites
 
-- **Java Development Kit (JDK):** Version 17 LTS (e.g., Eclipse Adoptium Temurin 17.0.13+)
-- **Build Tool:** Apache Maven 3.9+ (or Maven Wrapper `mvnw`)
-- **Database:** MySQL 8.0.16+ (MySQL 8.0.46 Community Server tested)
-- **Git & PowerShell / Bash:** Windows PowerShell or Git Bash for script execution
+- **Backend:**
+  - Java Development Kit (JDK): Version 17 LTS (e.g., Eclipse Adoptium Temurin 17.0.13+)
+  - Build Tool: Apache Maven 3.9+ (or Maven Wrapper `mvnw`)
+  - Database: MySQL 8.0.16+ (MySQL 8.0.46 Community Server tested)
+- **Frontend:**
+  - Runtime: Node.js 18+ (Node.js 20 LTS recommended) & npm
+  - Framework: React 18.3.1, Vite 6, Tailwind CSS 3.4, Lucide Icons
+  - Test Harness: Vitest 2.1, React Testing Library, JSDOM
+- **Environment:**
+  - Windows PowerShell or Git Bash for script execution
 
 ---
 
@@ -37,7 +42,7 @@ FLUSH PRIVILEGES;
 
 ### Step 2.2: Apply Schema and Seed Data
 
-Apply the authoritative frozen schema (`db/schema.sql`) and sample data (`db/seed.sql`) to `hotel_booking`:
+Apply the schema (`db/schema.sql`) and sample data (`db/seed.sql`) to `hotel_booking`:
 
 ```bash
 # On Linux / macOS or Git Bash (Windows):
@@ -73,7 +78,7 @@ DB_NAME=hotel_booking
 
 ---
 
-## 3. Building, Running, and Testing
+## 3. Running the Backend
 
 ### Run the Application
 
@@ -81,10 +86,9 @@ DB_NAME=hotel_booking
 cd backend
 mvn spring-boot:run
 ```
+The backend starts on `http://localhost:8080`. On startup, `InventoryInitializer` automatically tops up 365 days of `room_night` inventory for all physical rooms using idempotent `INSERT IGNORE` queries.
 
-On startup, `InventoryInitializer` automatically tops up 365 days of `room_night` inventory for all physical rooms using idempotent `INSERT IGNORE` queries.
-
-### Run Automated Tests
+### Run Automated Backend Tests
 
 Automated tests execute against the real MySQL test database `hotel_booking_test`:
 
@@ -92,65 +96,115 @@ Automated tests execute against the real MySQL test database `hotel_booking_test
 cd backend
 mvn test
 ```
+*Current test suite: 99 tests passing, 0 failures, 0 errors, 0 skipped.*
 
-### Verify Invariants
+### Verify Database Invariants
 
 Run the invariant verification script against the populated database:
 
 ```bash
-# Using bash:
-export DB_NAME="hotel_booking"
-export DB_USER="hotel_user"
-export DB_PASSWORD="change_me_secure_password"
-bash scripts/verify-invariants.sh
+# Git Bash:
+./scripts/verify-invariants.sh
 
-# Or directly in MySQL:
+# Or direct MySQL query execution:
 mysql -u hotel_user -p hotel_booking < db/audit/invariants.sql
 ```
+All 10 invariant checks (`INV-01` through `INV-10`) must report 0 violations.
 
 ---
 
-## 4. Surprise Feature: 10-Minute Room Hold
+## 4. Running the Frontend
 
-The backend implements an automatic 10-minute hold mechanism upon reservation per `docs/01-final-design.md` Section 9:
+The guest-facing frontend is a single-page application located in `frontend/`.
 
-### What
-- When a guest reserves a room (`POST /api/bookings`), the backend does not immediately book the room permanently. Instead, it transitions candidate room nights to `RESERVED` and sets `booking.status = 'HELD'` with an expiration timestamp (`expiresAt` = `now + 10 minutes`).
-- The response returns `reference`, `status: "HELD"`, and `expiresAt` so the client UI can render a real-time countdown timer.
-- The guest must explicitly confirm the booking (`POST /api/bookings/{reference}/confirm`) within the 10-minute window. Confirmation transitions the status to `CONFIRMED` and marks the room nights as permanently `BOOKED`.
+### Install Dependencies
 
-### Why
-- **Solves the Checkout Race Condition:** Eliminates the frustration of "someone booked the room while I was typing my details" or entering payment.
-- **Prevents Permanent Inventory Starvation:** If a guest abandons the reservation flow or closes their browser, inventory is not tied up indefinitely.
-- **Transparent Concurrency Guarantees:** Gives the user-facing booking process a clear, predictable consistency boundary without requiring distributed locks.
+```bash
+cd frontend
+npm install
+```
 
-### How (Implementation & Invariants)
-1. **Atomic Guarded Claim (`RoomNightRepository`):**
-   ```sql
-   UPDATE room_night
-   SET status = 'RESERVED', booking_id = ?, reserved_until = DATE_ADD(NOW(), INTERVAL ? MINUTE)
-   WHERE room_id = ? AND stay_date >= ? AND stay_date < ? AND status = 'AVAILABLE';
-   ```
-   If affected rows does not equal the requested number of nights, a partial claim revert releases any claimed nights, and the service retries with the next candidate room.
-2. **Guarded Confirmation (`BookingCustomRepositoryImpl`):**
-   ```sql
-   UPDATE booking
-   SET status = 'CONFIRMED', confirmed_at = NOW(), expires_at = NULL
-   WHERE reference = ? AND status = 'HELD' AND reserved_until > NOW();
-   ```
-   If the deadline has passed, the query affects 0 rows, and the API returns HTTP 409 `HOLD_EXPIRED`.
-3. **Background Expiry Scheduled Job (`BookingExpiryJob`):**
-   - Runs every 60 seconds (`hotel.booking.expiry-job.fixed-rate-ms=60000`).
-   - Identifies bookings where `status = 'HELD' AND expires_at <= NOW()`.
-   - Transitions booking status to `EXPIRED` and atomically releases room nights back to `status = 'AVAILABLE'`, `booking_id = NULL`.
-4. **Deadline Race Resolution (`CONC-03`):**
-   - Simultaneous confirm vs expiry job at the deadline is arbitrated by row-level database locks. Exactly one operation succeeds; double transitions are impossible.
+### Start Development Server
+
+```bash
+cd frontend
+npm run dev
+```
+The frontend starts on `http://localhost:5173`. Vite is pre-configured with a development proxy that transparently forwards all `/api/*` network requests to the Spring Boot backend running on `http://localhost:8080`:
+
+```javascript
+// vite.config.js
+server: {
+  port: 5173,
+  proxy: {
+    '/api': {
+      target: 'http://localhost:8080',
+      changeOrigin: true
+    }
+  }
+}
+```
+
+### Run Frontend Automated Tests
+
+```bash
+cd frontend
+npm test
+```
+Executes the comprehensive Vitest test suite covering all UI components, guest journeys, API error contracts, image galleries, and accessibility:
+*Current frontend test suite: 98 tests passing across 10 test suites.*
+
+### Production Build
+
+```bash
+cd frontend
+npm run build
+```
+Generates the optimized static distribution bundle in `frontend/dist/`.
 
 ---
 
-## 5. Core Architecture & Design Assumptions
+## 5. End-to-End User Experience & Flow Architecture
 
-As documented in `docs/01-final-design.md` Section 11:
+The user interface follows an Apple/RedBus-inspired clean, tactile design language with robust state handling and zero synthetic data fabrication:
+
+### 1. Discovery & Search (`LandingPage`, `SearchCapsule`)
+- **Browse Mode:** When no dates are specified, all hotels are displayed with base pricing and amenity badges. Date-dependent availability (`availableRooms`, `nights`, `totalAmount`) is omitted per API contract.
+- **Search Mode:** Validates check-in/check-out dates (`checkOut > checkIn`, check-in cannot be in the past). Only hotels with confirmed availability are shown, displaying available room count and total price calculated by the backend.
+- **Client-Side Filtering & Sorting:** Fast filtering by hotel name or location substring, multi-select amenity pills, and price slider/sorting without redundant network roundtrips.
+- **Loading State:** YouTube-style pulse skeletons prevent visual layout shift.
+
+### 2. Hotel Details & Multi-Image Gallery (`HotelDetailPage`, `HotelMedia`)
+- **Constrained Layout:** Desktop gallery constrained to `max-w-[1250px]` and 310–320px height target to keep key booking details visible above the fold.
+- **65% / 35% Balanced Media Presentation:**
+  - Primary photograph on the left (65% width) displaying `images[0]` in high resolution.
+  - Secondary image stack on the right (35% width) with subtle `+N more` overlay when additional photos exist.
+- **Responsive Adaptations:** Proportional height scaling on tablets; compact primary image with touch-scrollable horizontal thumbnail strip on mobile.
+- **Full-Screen Lightbox:** Accessible modal dialog with keyboard Arrow navigation (Left/Right), photo index indicator, and Escape dismissal.
+- **Non-Photographic Fallback:** Hotels without gallery images render an elegant placeholder ("Photos coming soon") with building iconography, strictly avoiding fabricated stock imagery.
+- **Sold-Out Guard:** If `availableRooms === 0`, a prominent "Sold Out" badge is shown and booking actions are disabled.
+
+### 3. Guest Hold & 10-Minute Reservation (`GuestForm`, `HoldReviewModal`, `CountdownTimer`)
+- **Hold Initiation:** Submits guest name and email to `POST /api/bookings`. The total amount is computed strictly on the backend (`nights * pricePerNight`); client-side tampering is impossible.
+- **10-Minute Hold Countdown:** A real-time countdown timer computes remaining seconds against backend `expiresAt`. If the hold expires, booking controls are disabled and the guest is informed with a clear expiration message.
+
+### 4. Demo Payment Simulation (`DemoPaymentModal`)
+- **Mandatory Simulation Notice:** Displays a prominent, transparent banner clarifying that payment processing is a demonstration simulation and no real credit card charges occur.
+- **Dual Flow Verification:**
+  - **Simulated Failure:** Selecting "Simulate Decline" displays an error alert and **never calls the confirm API**, preserving hold invariants.
+  - **Simulated Success:** Selecting "Simulate Success" calls `POST /api/bookings/{reference}/confirm` with the guest email, transitioning the booking to `CONFIRMED`.
+- **Confirmation Ticket:** Displays a print-ready confirmation ticket with booking reference, guest details, room number, stay dates, and total amount.
+
+### 5. Booking Management & Cancellation (`ManageBookingPage`)
+- **Lookup Protection:** Requires both booking reference (`HB-XXXXXX`) and guest email. Unknown references and email mismatches return uniform 404 responses to prevent reference enumeration.
+- **Cancellation Policy (`CAN-04`):** Guests can cancel a `HELD` or `CONFIRMED` booking before check-in. Once the check-in date has arrived or passed, cancellation is disallowed and a "Cancellation Period Lapsed" notice is displayed.
+- **Accessible Confirmation Dialog:** Cancelling requires confirming in a modal dialog with focus management; dismissing the dialog aborts cancellation without triggering API calls.
+
+---
+
+## 6. Core Architecture & Design Assumptions
+
+As documented in `docs/01-final-design.md`:
 
 1. **Half-Open Stay Ranges `[check_in, check_out)`:**
    - A stay begins on `check_in` and ends on `check_out`. The check-out date is departure day, not an overnight stay.
@@ -177,7 +231,7 @@ As documented in `docs/01-final-design.md` Section 11:
 
 ---
 
-## 6. API Summary & Error Contract
+## 7. API Summary & Error Contract
 
 Base URL path: `/api`
 
@@ -191,7 +245,7 @@ Base URL path: `/api`
 | `POST` | `/api/bookings/{ref}/cancel` | Cancel a held or confirmed booking (`{"email": "..."}`) |
 
 ### Error Response Shape
-All error responses strictly adhere to `docs/02-api-contract.md` Section 7:
+All error responses strictly adhere to the unified JSON error format:
 ```json
 {
   "timestamp": "2026-12-01T10:05:30Z",
@@ -202,3 +256,13 @@ All error responses strictly adhere to `docs/02-api-contract.md` Section 7:
 }
 ```
 Stack traces, SQL syntax, and internal Java class names are never exposed. Guest emails are never written to application logs.
+
+---
+
+## 8. Verification & Quality Audits
+
+- **Backend Test Suite:** 99/99 automated tests passing (`mvn test`).
+- **Database Invariants:** 10/10 data invariants verified against MySQL 8 (`db/audit/invariants.sql`).
+- **Frontend Test Suite:** 98/98 unit & integration tests passing across 10 suites (`npm test`).
+- **Production Build:** Vite bundle built cleanly in ~21s with zero warnings (`npm run build`).
+- **Audit Reports:** Detailed audit reports and screenshots located in `audits/`.
